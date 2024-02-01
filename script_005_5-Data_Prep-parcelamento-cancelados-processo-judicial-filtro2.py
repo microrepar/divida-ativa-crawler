@@ -19,7 +19,7 @@ from config import Config
 today = datetime.today()
 nome_arquivo = 'parcelamento-cancelados-processo-judicial-filtro2'
 file_directory = Config.DIR_DESTINO / "csv"
-summary_file = Path.cwd() / "data" / "processed" / f"summary_{nome_arquivo}.pkl"
+summary_file = Path.cwd() / "data" / "processed" / Config.DATA_DOWNLOAD / f"summary_{nome_arquivo}.parquet"
 
 in_files = [f for f in file_directory.glob('*.csv') 
             if f.name.startswith(nome_arquivo)]
@@ -61,23 +61,12 @@ if dataframe_list:
     print(df.shape)
     df.head()
 
-    # https://stackoverflow.com/questions/30763351/removing-space-in-dataframe-python
-    df.columns = [x.strip() for x in df.columns]
-
-    cols_to_rename = {'col1': 'New_Name'}
-    df.rename(columns=cols_to_rename, inplace=True)
-
-    df.to_pickle(summary_file)
-
     # ### Column Cleanup
     # - Remove all leading and trailing spaces
     # - Rename the columns for consistency.
-
     # https://stackoverflow.com/questions/30763351/removing-space-in-dataframe-python
     df.columns = [x.strip() for x in df.columns]
     df.columns
-
-    {col: '' for col in df.columns}
 
     cols_to_rename = {
         'Inscrição'       : 'Inscricao',
@@ -99,7 +88,7 @@ if dataframe_list:
                                                 .str.replace(',', '.', regex=False)
                                                 .astype('Float64'))
 
-    df['Saldo'] = df['Saldo'].replace({'Cancelado': None})
+    df['Saldo'] = df['Saldo'].replace({'Cancelado': -1})
 
     df['Saldo'] = (df['Saldo'].str.replace('.', '', regex=False)
                                                 .str.replace(',', '.', regex=False)
@@ -116,8 +105,6 @@ if dataframe_list:
     df['DataPrimeiraParcelaPaga'] = df['DataPrimeiraParcelaPaga'].apply(corrige_data)
 
     # ### Data Manipulation
-    print(df.head(3))
-
     for col in df.columns:
         print(f'{col:.<30}:', max([len(str(v)) for v in df[col]]))
 
@@ -133,7 +120,6 @@ if dataframe_list:
         print(f'{col:.<30}:', min([len(str(v)) for v in df[col]]))
 
     # ### Save output file into processed directory
-    summary_file = summary_file.with_suffix('.parquet')
     df.to_parquet(summary_file)
 
 else:

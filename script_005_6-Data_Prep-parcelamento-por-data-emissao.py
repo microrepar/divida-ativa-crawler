@@ -19,7 +19,7 @@ from config import Config
 today = datetime.today()
 nome_arquivo = 'parcelamento-por-data-emissao'
 file_directory = Config.DIR_DESTINO / "csv"
-summary_file = Path.cwd() / "data" / "processed" / f"summary_{nome_arquivo}.pkl"
+summary_file = Path.cwd() / "data" / "processed" / Config.DATA_DOWNLOAD / f"summary_{nome_arquivo}.parquet"
 
 in_files = [f for f in file_directory.glob('*.csv') 
             if f.name.startswith(nome_arquivo)]
@@ -62,32 +62,21 @@ if dataframe_list:
     print(df.shape)
     df.head()
 
-    # https://stackoverflow.com/questions/30763351/removing-space-in-dataframe-python
-    df.columns = [x.strip() for x in df.columns]
-
-    cols_to_rename = {'col1': 'New_Name'}
-    df.rename(columns=cols_to_rename, inplace=True)
-
-    df.to_pickle(summary_file)
-
     # ### Column Cleanup
     # - Remove all leading and trailing spaces
     # - Rename the columns for consistency.
     # https://stackoverflow.com/questions/30763351/removing-space-in-dataframe-python
     df.columns = [x.strip() for x in df.columns]
 
-    {col: '' for col in df.columns}
     cols_to_rename = {
-        'Inscrição': 'Inscricao',
-        'Valor Parcelado': 'ValorParcelado',
-        'Pcs': 'Parcelamento',
-        'Data do acordo': 'DataAcordo',
-        'Valor Pago': 'ValorPago',
-        'Honorarios': 'Honorarios',
-        'Pc': 'Parcela',
-        'Data do Pagto': 'DataPagamento',
-        'Tipo': 'TipoNum',
-        'Tipo de Parc.': '',
+        'Inscrição'       : 'Inscricao',
+        'Valor Parcelado' : 'ValorParcelado',
+        'Pcs'             : 'Parcelas',
+        'Data do acordo'  : 'DataAcordo',
+        'Valor Pago'      : 'ValorPago',
+        'Data do Pagto'   : 'DataPagamento',
+        'Tipo de Parc.'   : 'TipoParcelamento',
+        'Usuário'         : 'Usuario',
     }
     df.rename(columns=cols_to_rename, inplace=True)
 
@@ -112,9 +101,6 @@ if dataframe_list:
     df['DataAcordo'] = pd.to_datetime(df['DataAcordo'], format=f'%d/%m/%Y')
 
     # ### Data Manipulation
-    print(df.head(3))
-    df.shape
-
     for col in df.columns:
         print(f'{col:.<30}:', max([len(str(v)) for v in df[col]]))
 
@@ -124,7 +110,7 @@ if dataframe_list:
     )
 
     df['IdCadastro'] = (
-        (df['TipoNum'].astype(str)).apply(lambda x: f'{x:0>3}') + 
+        (df['Tipo'].astype(str)).apply(lambda x: f'{x:0>3}') + 
         (df['Inscricao'].astype(str)).apply(lambda x: f'{x:0>12}')
     )
 
@@ -135,7 +121,6 @@ if dataframe_list:
         print(f'{col:.<30}:', min([len(str(v)) for v in df[col]]))
 
     # ### Save output file into processed directory
-    summary_file = summary_file.with_suffix('.parquet')
     df.to_parquet(summary_file)
 
 else:

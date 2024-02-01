@@ -19,7 +19,7 @@ from datetime import datetime
 today = datetime.today()
 nome_arquivo = 'parcelamento-cancelados-processo-judicial-filtro1'
 file_directory = Config.DIR_DESTINO / "csv"
-summary_file = Path.cwd() / "data" / "processed" / f"summary_{nome_arquivo}.pkl"
+summary_file = Path.cwd() / "data" / "processed" / Config.DATA_DOWNLOAD / f"summary_{nome_arquivo}.parquet"
 
 in_files = [f for f in file_directory.glob('*.csv') 
             if f.name.startswith(nome_arquivo)]
@@ -42,7 +42,6 @@ for file_ in in_files:
                 columns = dfi.iloc[0]
                 dfi.columns = columns
                 dfi = dfi.iloc[1:]
-                # print(dfi.columns)
                 contador += 1
 
             dataframe_list.append(dfi)
@@ -62,39 +61,21 @@ if dataframe_list:
     print(df.shape)
     df.head()
 
-    # https://stackoverflow.com/questions/30763351/removing-space-in-dataframe-python
-    df.columns = [x.strip() for x in df.columns]
-
-    cols_to_rename = {'col1': 'New_Name'}
-    df.rename(columns=cols_to_rename, inplace=True)
-
-    df.to_pickle(summary_file)
-
     # ### Column Cleanup
     # - Remove all leading and trailing spaces
     # - Rename the columns for consistency.
     # https://stackoverflow.com/questions/30763351/removing-space-in-dataframe-python
     df.columns = [x.strip() for x in df.columns]
 
-    {col: '' for col in df.columns}
-
-    cols_to_rename = {
-        'Inscrição'       : 'Inscricao',
-        'Descrição'       : 'Descricao',
-        'Vl Parcelamento' : 'ValorParcelado',
-        'Valor pago'      : 'ValorPago',
-        'Proc.Judicial'   : 'ProcessoJudicial',
-    }
+    cols_to_rename = {}
     df.rename(columns=cols_to_rename, inplace=True)
 
     # ### Clean Up Data Types
-    df.dtypes
-
-    df['ValorParcelado'] = (df['ValorParcelado'].str.replace('.', '', regex=False)
+    df['Vl Parcelamento'] = (df['Vl Parcelamento'].str.replace('.', '', regex=False)
                                                 .str.replace(',', '.', regex=False)
                                                 .astype('Float64'))
 
-    df['ValorPago'] = (df['ValorPago'].str.replace('.', '', regex=False)
+    df['Valor pago'] = (df['Valor pago'].str.replace('.', '', regex=False)
                                                 .str.replace(',', '.', regex=False)
                                                 .astype('Float64'))
 
@@ -112,8 +93,6 @@ if dataframe_list:
 
     df['Cancelados'] = df['Cancelados'].apply(corrige_data)
 
-    print(df.head(3))
-
     for col in df.columns:
         print(f'{col:.<30}:', max([len(str(v)) for v in df[col]]))
 
@@ -121,7 +100,6 @@ if dataframe_list:
         (df['Ano'].astype(str)) + 
         (df['Numero'].astype(str)).apply(lambda x: f'{x:0>5}')
     )
-    df['IdAcordo'].head(3)
 
     for col in df.columns:
         print(f'{col:.<30}:', max([len(str(v)) for v in df[col]]))
@@ -130,10 +108,7 @@ if dataframe_list:
         print(f'{col:.<30}:', min([len(str(v)) for v in df[col]]))
 
     # ### Save output file into processed directory
-    summary_file = summary_file.with_suffix('.parquet')
     df.to_parquet(summary_file)
 
 else:
     print(f'Nenhum dado foi encontrado nos arquivos .csv que iniciam com "{nome_arquivo}"')
-
-

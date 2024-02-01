@@ -22,9 +22,12 @@ class Config:
     USUARIO = os.getenv('USUARIO')
     SENHA   = os.getenv('SENHA')
     
-    ANO_INICIAL = 2023
-    ANO_FINAL   = 2023
+    ANO_INICIAL   = os.getenv('ANO_INICIAL')
+    ANO_FINAL     = os.getenv('ANO_FINAL')
+    DATA_DOWNLOAD = os.getenv('DATA_DOWNLOAD')
 
     MAX_WAIT    = None
-    DIR_DESTINO = Path.home() / 'divida_ativa' / '2023-12-28'
+    DIR_DESTINO = Path.home() / 'divida_ativa' / DATA_DOWNLOAD
     DIR_DESTINO.mkdir(parents=True, exist_ok=True)
+
+    (HERE / 'data' / 'processed' / DATA_DOWNLOAD).mkdir(parents=True, exist_ok=True)
