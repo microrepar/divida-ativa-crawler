@@ -22,8 +22,8 @@ class Config:
     USUARIO = os.getenv('USUARIO')
     SENHA   = os.getenv('SENHA')
     
-    ANO_INICIAL   = os.getenv('ANO_INICIAL')
-    ANO_FINAL     = os.getenv('ANO_FINAL')
+    ANO_INICIAL   = int(os.getenv('ANO_INICIAL'))
+    ANO_FINAL     = int(os.getenv('ANO_FINAL'))
     DATA_DOWNLOAD = os.getenv('DATA_DOWNLOAD')
 
     MAX_WAIT    = None
