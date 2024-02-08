@@ -31,3 +31,5 @@ class Config:
     DIR_DESTINO.mkdir(parents=True, exist_ok=True)
 
     (HERE / 'data' / 'processed' / DATA_DOWNLOAD).mkdir(parents=True, exist_ok=True)
+
+print('>>>>>>>>>>DATA DOWNLOAD>>>>>>>>>>>>', Config.DATA_DOWNLOAD)
