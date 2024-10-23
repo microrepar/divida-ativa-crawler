@@ -33,8 +33,10 @@ def get_divida_ativa_driver():
         'safebrowsing.enabled': True
     })
 
-    driver = webdriver.Chrome( 
-        service=ChromeService(ChromeDriverManager().install()),
+    driver = webdriver.Chrome(
+        # NOTE: When line bellow commented, code works.
+        # NOTE: library maintenance holted by author. Try update driver manually
+        # service=ChromeService(ChromeDriverManager().install()),
         options=options
     )
 

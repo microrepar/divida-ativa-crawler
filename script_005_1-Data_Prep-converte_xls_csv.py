@@ -51,9 +51,18 @@ for file_ in in_files:
     workbook = desktop.open_file(file_)    
     subprocess.Popen(['start', file_], shell=True)
     # print(file_)
-    
+
     click_vision('btn_sim_continuar', before=1, ignore_error=True, max_wait=60)
     click_vision('btn_sim_continuar', before=1, max_wait=3, ignore_error=True)
+    
+    # NOTE Retirar snippet se comprar lincença
+    for _ in range(80):
+        try:
+            click_vision('btn_fechar_aviso_licenca', before=1, max_wait=10)
+            break
+        except:
+            time.sleep(3)
+            continue
     
     click_vision('btn_menu_arquivo', before=1, ignore_error=True, max_wait=3)
     

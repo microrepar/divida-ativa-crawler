@@ -13,7 +13,11 @@ HERE = Path(__name__).parent
 (HERE / 'data' / 'raw').mkdir(parents=True, exist_ok=True)
 
 (HERE / 'resources' / 'images').mkdir(parents=True, exist_ok=True)
-(HERE / 'resources' / 'images_error').mkdir(parents=True, exist_ok=True)
+
+images_error_path = (HERE / 'resources' / 'images_error')
+images_error_path.mkdir(parents=True, exist_ok=True)
+for img in images_error_path.glob('*.png'):
+    img.unlink()
 
 class Config:
 
